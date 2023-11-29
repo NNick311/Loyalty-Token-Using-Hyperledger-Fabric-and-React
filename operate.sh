@@ -100,7 +100,8 @@ function networkUp() {
         chmod +x scripts/*
     fi
 
-    # checkPrereqs
+    checkPrereqs
+
     if [ ! -d "./artifacts/network/crypto-config" ]; then
         generateCerts
         generateChannelArtifacts
@@ -109,35 +110,37 @@ function networkUp() {
     export MANUFACTURER_CA_PRIVATE_KEY=$(cd ./artifacts/network/crypto-config/peerOrganizations/manufacturer.example.com/ca && ls *_sk)
     export MIDDLEMEN_CA_PRIVATE_KEY=$(cd ./artifacts/network/crypto-config/peerOrganizations/middlemen.example.com/ca && ls *_sk)
     export CONSUMER_CA_PRIVATE_KEY=$(cd ./artifacts/network/crypto-config/peerOrganizations/consumer.example.com/ca && ls *_sk)
-    docker-compose -f $COMPOSE_FILE up -d 2>&1
-    if [ $? -ne 0 ]; then
+
+    docker-compose -f $COMPOSE_FILE up -d --force-recreate 2>&1
+    res=$?
+    if [ $res -ne 0 ]; then
         echo "ERROR !!!! Unable to start network"
         exit 1
     fi
 
-    # now run the end to end script
+    # Now run the end-to-end script
     docker exec cli scripts/script.sh
-    if [ $? -ne 0 ]; then
+    res=$?
+    if [ $res -ne 0 ]; then
         echo "ERROR !!!! Test failed"
         exit 1
     fi
 }
-
 # Tear down running network
-# function networkDown() {
-#     export MANUFACTURER_CA_PRIVATE_KEY=$(cd ./artifacts/network/crypto-config/peerOrganizations/manufacturer.example.com/ca && ls *_sk)
-#     export MIDDLEMEN_CA_PRIVATE_KEY=$(cd ./artifacts/network/crypto-config/peerOrganizations/middlemen.example.com/ca && ls *_sk)
-#     export CONSUMER_CA_PRIVATE_KEY=$(cd ./artifacts/network/crypto-config/peerOrganizations/consumer.example.com/ca && ls *_sk)
+function networkDown() {
+    export MANUFACTURER_CA_PRIVATE_KEY=$(cd ./artifacts/network/crypto-config/peerOrganizations/manufacturer.example.com/ca && ls *_sk)
+    export MIDDLEMEN_CA_PRIVATE_KEY=$(cd ./artifacts/network/crypto-config/peerOrganizations/middlemen.example.com/ca && ls *_sk)
+    export CONSUMER_CA_PRIVATE_KEY=$(cd ./artifacts/network/crypto-config/peerOrganizations/consumer.example.com/ca && ls *_sk)
 
-#     docker-compose -f $COMPOSE_FILE down --volumes --remove-orphans
+    docker-compose -f $COMPOSE_FILE down --volumes --remove-orphans
 
-#     if [ $MODE != "restart" ]; then
-#         docker run -v $PWD:/tmp/jnu_hlfn --rm hyperledger/fabric-tools:$IMAGETAG rm -rf /tmp/jnu_hlfn/ledgers-backup
-#         clearContainers
-#         removeUnwantedImages
-#         rm -rf ./artifacts/network/*.block ./artifacts/network/*.tx ./artifacts/network/crypto-config/
-#     fi
-# }
+    if [ $MODE != "restart" ]; then
+        docker run -v $PWD:/tmp/jnu_hlfn --rm hyperledger/fabric-tools:$IMAGETAG rm -rf /tmp/jnu_hlfn/ledgers-backup
+        clearContainers
+        removeUnwantedImages
+        rm -rf ./artifacts/network/*.block ./artifacts/network/*.tx ./artifacts/network/crypto-config/
+    fi
+}
 
 # Generates Org certs using cryptogen tool
 function generateCerts() {
@@ -254,7 +257,6 @@ COMPOSE_FILE=./artifacts/docker-compose.yaml
 IMAGETAG="1.4.6"
 CONSENSUS_TYPE="solo"
 PROCEED_ASK="true"
-# Parse commandline args
 MODE=$1
 shift
 
