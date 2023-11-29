@@ -64,6 +64,7 @@ If it fails, please install all the above mentioned software by refrerring to fi
 `chmod 777 operate.sh`
 
 `sudo ./operate.sh up`
+'IMAGE_TAG=1.4.6 bash operate.sh up'
 
 When you run a script, the following things happen in order:
 
