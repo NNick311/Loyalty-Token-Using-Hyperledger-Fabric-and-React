@@ -52,46 +52,44 @@ function clearContainers() {
 }
 
 # Delete any images that were generated as a part of this setup
-# function removeUnwantedImages() {
-#     AWK_PATTERN="dev-peer.*.$CC_NAME.*"
-#     DOCKER_IMAGE_IDS=$(docker images | awk -v PAT=$AWK_PATTERN '($1 ~ PAT) {print $3}')
-#     if [ -z "$DOCKER_IMAGE_IDS" -o "$DOCKER_IMAGE_IDS" == " " ]; then
-#         echo "---- No images available for deletion ----"
-#     else
-#         docker rmi -f $DOCKER_IMAGE_IDS
-#     fi
-# }
+function removeUnwantedImages() {
+    AWK_PATTERN="dev-peer.*.$CC_NAME.*"
+     DOCKER_IMAGE_IDS=$(docker images | awk -v PAT=$AWK_PATTERN '($1 ~ PAT) {print $3}')
+     if [ -z "$DOCKER_IMAGE_IDS" -o "$DOCKER_IMAGE_IDS" == " " ]; then
+        echo "---- No images available for deletion ----"
+     else
+         docker rmi -f $DOCKER_IMAGE_IDS
+     fi
+ }
 
 # Do some basic sanity checking to make sure that the appropriate versions of fabric
-# function checkPrereqs() {
-#     BLACKLISTED_VERSIONS="^1\.0\. ^1\.1\.0-preview ^1\.1\.0-alpha"
-#     LOCAL_VERSION=$(configtxlator version | sed -ne 's/ Version: //p')
-#     DOCKER_IMAGE_VERSION=$(docker run --rm hyperledger/fabric-tools:$IMAGETAG peer version | sed -ne 's/ Version: //p' | head -1)
+ function checkPrereqs() {
+     BLACKLISTED_VERSIONS="^1\.0\. ^1\.1\.0-preview ^1\.1\.0-alpha"
+     LOCAL_VERSION=$(configtxlator version | sed -ne 's/ Version: //p')
+     DOCKER_IMAGE_VERSION=$(docker run --rm hyperledger/fabric-tools:$IMAGETAG peer version | sed -ne 's/ Version: //p' | head -1)
 
-#     echo "LOCAL_VERSION=$LOCAL_VERSION"
-#     echo "DOCKER_IMAGE_VERSION=$DOCKER_IMAGE_VERSION"
+     echo "LOCAL_VERSION=$LOCAL_VERSION"
+     echo "DOCKER_IMAGE_VERSION=$DOCKER_IMAGE_VERSION"
 
-#     if [ $LOCAL_VERSION != $DOCKER_IMAGE_VERSION ]; then
-#         echo "=================== WARNING ==================="
-#         echo "  Local fabric binaries and docker images are  "
-#         echo "  out of  sync. This may cause problems.       "
-#         echo "==============================================="
-#     fi
+     if [ $LOCAL_VERSION != $DOCKER_IMAGE_VERSION ]; then
+         echo "=================== WARNING ==================="
+         echo "  Local fabric binaries and docker images are  "
+         echo "  out of  sync. This may cause problems.       "
+         echo "==============================================="
+     fi
+     for UNSUPPORTED_VERSION in $BLACKLISTED_VERSIONS; do
+         echo $LOCAL_VERSION | grep -q $UNSUPPORTED_VERSION
+        if [ $? -eq 0 ]; then
+             echo "ERROR! Local Fabric binary version of $LOCAL_VERSION does not match this newer version of BYFN and is unsupported. Either move to a later version of Fabric or checkout an earlier version of fabric-samples."
+             exit 1#         fi
 
-#     for UNSUPPORTED_VERSION in $BLACKLISTED_VERSIONS; do
-#         echo $LOCAL_VERSION | grep -q $UNSUPPORTED_VERSION
-#         if [ $? -eq 0 ]; then
-#             echo "ERROR! Local Fabric binary version of $LOCAL_VERSION does not match this newer version of BYFN and is unsupported. Either move to a later version of Fabric or checkout an earlier version of fabric-samples."
-#             exit 1
-#         fi
-
-#         echo $DOCKER_IMAGE_VERSION | grep -q $UNSUPPORTED_VERSION
-#         if [ $? -eq 0 ]; then
-#             echo "ERROR! Fabric Docker image version of $DOCKER_IMAGE_VERSION does not match this newer version of BYFN and is unsupported. Either move to a later version of Fabric or checkout an earlier version of fabric-samples."
-#             exit 1
-#         fi
-#     done
-# }
+         echo $DOCKER_IMAGE_VERSION | grep -q $UNSUPPORTED_VERSION
+         if [ $? -eq 0 ]; then
+             echo "ERROR! Fabric Docker image version of $DOCKER_IMAGE_VERSION does not match this newer version of BYFN and is unsupported. Either move to a later version of Fabric or checkout an earlier version of fabric-samples."
+             exit 1
+         fi
+     done
+ }
 
 # Generate the needed certificates, the genesis block and start the network.
 function networkUp() {
