@@ -28,7 +28,7 @@ CC_SRC_PATH="github.com/chaincode/"
 echo "Channel name : $CHANNEL_NAME"
 
 # Import utils
-. ./scripts/utils.sh
+. /utils.sh
 
 createChannel() {
     setGlobals 0 1
