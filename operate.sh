@@ -65,8 +65,8 @@ function removeUnwantedImages() {
 # Do some basic sanity checking to make sure that the appropriate versions of fabric
  function checkPrereqs() {
     BLACKLISTED_VERSIONS="^1\.0\. ^1\.1\.0-preview ^1\.1\.0-alpha"
-    LOCAL_VERSION=$(configtxlator version | sed -ne 's/ Version: //p')
-    DOCKER_IMAGE_VERSION=$(docker run --rm hyperledger/fabric-tools:$IMAGETAG peer version | sed -ne 's/ Version: //p' | head -1)
+    LOCAL_VERSION=$(configtxlator version 2>/dev/null | sed -ne 's/ Version: //p' || echo "")
+    DOCKER_IMAGE_VERSION=$(docker run --rm hyperledger/fabric-tools:$IMAGETAG peer version 2>/dev/null | sed -ne 's/ Version: //p' | head -1 || echo "")
 
     echo "LOCAL_VERSION=$LOCAL_VERSION"
     echo "DOCKER_IMAGE_VERSION=$DOCKER_IMAGE_VERSION"
