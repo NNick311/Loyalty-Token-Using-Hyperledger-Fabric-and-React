@@ -5,6 +5,9 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
+# Chuyển đến thư mục chứa script
+cd "$(dirname "$0")"
+
 echo
 echo " ____    _____      _      ____    _____ "
 echo "/ ___|  |_   _|    / \    |  _ \  |_   _|"
@@ -22,10 +25,10 @@ MAX_RETRY=5
 
 CC_NAME="dummycc"
 CC_SRC_PATH="github.com/chaincode/"
-echo "Channel name : "$CHANNEL_NAME
+echo "Channel name : $CHANNEL_NAME"
 
-# import utils
-. scripts/utils.sh
+# Import utils
+. ./scripts/utils.sh
 
 createChannel() {
     setGlobals 0 1
