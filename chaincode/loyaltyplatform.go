@@ -235,7 +235,7 @@ func (t *loyalty_platform) initLedger(APIstub shim.ChaincodeStubInterface, args 
 	fmt.Println("Added", pg)
 
 	// seed P&G admin
-	entityUser := Entity_User{ID: "admin", Entity_ID: "Entity1", Role: "admin", Name: "P&G", Email: "admin@pg.com", Phone: "1231231231", Hashed_PWD: "adminpw", Created_At: txTimeAsPtr, Updated_At: txTimeAsPtr}
+	entityUser := Entity_User{ID: "admin", Entity_ID: "Entity1", Role: "adminST", Name: "ST", Email: "admin@pg.com", Phone: "1231231231", Hashed_PWD: "adminST", Created_At: txTimeAsPtr, Updated_At: txTimeAsPtr}
 	entityUserAsBytes, errMarshal := json.Marshal(entityUser)
 
 	if errMarshal != nil {
