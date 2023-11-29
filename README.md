@@ -43,9 +43,8 @@ ________________________________________________________________________________
 
 ### Step 1. Clone the repository
 
-`git clone git@github.com:kuldeep23907/loyalty-token-using-hlf.git`
-
-`cd loyalty-token-using-hlf`
+git clone https://github.com/NNick311/Loyalty-Token-Using-Hyperledger-Fabric-and-React.git
+`cd Loyalty-Token-Using-Hyperledger-Fabric-and-React`
 
 ### Step 2. Install required softwares (if you already have all this with proper versions, please skip). Also this will take few minutes.
 
